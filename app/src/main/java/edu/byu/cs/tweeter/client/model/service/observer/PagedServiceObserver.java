@@ -1,4 +1,4 @@
-package edu.byu.cs.tweeter.client.model.service;
+package edu.byu.cs.tweeter.client.model.service.observer;
 
 import java.util.List;
 

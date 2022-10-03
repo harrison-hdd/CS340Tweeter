@@ -6,10 +6,6 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import edu.byu.cs.tweeter.client.backgroundTask.BackgroundTaskUtils;
 import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.FollowTask;
 import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.GetFollowersCountTask;
@@ -19,6 +15,9 @@ import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.pagedTask.GetF
 import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.IsFollowerTask;
 import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.UnfollowTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.GetFollowersHandler;
+import edu.byu.cs.tweeter.client.model.service.handler.GetFollowingHandler;
+import edu.byu.cs.tweeter.client.model.service.observer.PagedServiceObserver;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class FollowService {
@@ -110,8 +109,6 @@ public class FollowService {
             boolean success = msg.getData().getBoolean(IsFollowerTask.SUCCESS_KEY);
             if (success) {
                 boolean isFollower = msg.getData().getBoolean(IsFollowerTask.IS_FOLLOWER_KEY);
-
-                // If logged in user if a follower of the selected user, display the follow button as "following"
                 isFollowerObserver.handleIsFollowerSuccess(isFollower);
 
             } else if (msg.getData().containsKey(IsFollowerTask.MESSAGE_KEY)) {
@@ -182,8 +179,6 @@ public class FollowService {
         public void handleMessage(@NonNull Message msg) {
             boolean success = msg.getData().getBoolean(FollowTask.SUCCESS_KEY);
             if (success) {
-//                updateSelectedUserFollowingAndFollowers();
-//                updateFollowButton(false);
                 followObserver.handleFollowSuccess();
             } else if (msg.getData().containsKey(FollowTask.MESSAGE_KEY)) {
                 String message = msg.getData().getString(FollowTask.MESSAGE_KEY);
@@ -217,60 +212,6 @@ public class FollowService {
                 unfollowObserver.handleUnfollowFailure("Failed to unfollow because of exception: " + ex.getMessage());
             }
 
-        }
-    }
-
-    private class GetFollowingHandler extends Handler {
-        private final PagedServiceObserver<User> getFollowingObserver;
-
-        public GetFollowingHandler(PagedServiceObserver<User> getFollowingObserver){
-            super(Looper.getMainLooper());
-            this.getFollowingObserver = getFollowingObserver;
-        }
-
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetFollowingTask.SUCCESS_KEY);
-            if (success) {
-                List<User> followees = (List<User>) msg.getData().getSerializable(GetFollowingTask.ITEMS_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetFollowingTask.MORE_PAGES_KEY);
-                getFollowingObserver.handleSuccess(followees, hasMorePages);
-
-            } else if (msg.getData().containsKey(GetFollowingTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(GetFollowingTask.MESSAGE_KEY);
-                getFollowingObserver.handleFailure("Failed to get following: " + message);
-            } else if (msg.getData().containsKey(GetFollowingTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(GetFollowingTask.EXCEPTION_KEY);
-                getFollowingObserver.handleFailure("Failed to get following because of exception: " + ex.getMessage());
-            }
-        }
-    }
-
-    private class GetFollowersHandler extends Handler {
-        private final PagedServiceObserver<User> pageServiceObserver;
-
-        public GetFollowersHandler(PagedServiceObserver pagedServiceObserver){
-            this.pageServiceObserver = pagedServiceObserver;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-
-
-            boolean success = msg.getData().getBoolean(GetFollowersTask.SUCCESS_KEY);
-            if (success) {
-                List<User> followers = (List<User>) msg.getData().getSerializable(GetFollowersTask.ITEMS_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetFollowersTask.MORE_PAGES_KEY);
-
-                pageServiceObserver.handleSuccess(followers, hasMorePages);
-            } else if (msg.getData().containsKey(GetFollowersTask.MESSAGE_KEY)) {
-                String message = msg.getData().getString(GetFollowersTask.MESSAGE_KEY);
-                pageServiceObserver.handleFailure("Failed to get followers: " + message);
-            } else if (msg.getData().containsKey(GetFollowersTask.EXCEPTION_KEY)) {
-                Exception ex = (Exception) msg.getData().getSerializable(GetFollowersTask.EXCEPTION_KEY);
-                pageServiceObserver.handleFailure("Failed to get followers because of exception: " + ex.getMessage());
-            }
         }
     }
 }

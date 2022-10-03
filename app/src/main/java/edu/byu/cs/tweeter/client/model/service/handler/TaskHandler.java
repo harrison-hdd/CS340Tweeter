@@ -1,4 +1,4 @@
-package edu.byu.cs.tweeter.client.model.service;
+package edu.byu.cs.tweeter.client.model.service.handler;
 
 import android.os.Handler;
 import android.os.Looper;

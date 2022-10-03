@@ -1,14 +1,10 @@
 package edu.byu.cs.tweeter.client.model.service.handler;
 
-import android.os.Handler;
 import android.os.Message;
-
-import androidx.annotation.NonNull;
 
 import java.util.List;
 
 import edu.byu.cs.tweeter.client.backgroundTask.authenticatedTask.pagedTask.PagedTask;
-import edu.byu.cs.tweeter.client.model.service.TaskHandler;
 import edu.byu.cs.tweeter.client.model.service.observer.PagedServiceObserver;
 
 public abstract class PagedServiceHandler<ItemType> extends TaskHandler {

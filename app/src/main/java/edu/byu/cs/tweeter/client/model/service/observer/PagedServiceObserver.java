@@ -2,7 +2,8 @@ package edu.byu.cs.tweeter.client.model.service;
 
 import java.util.List;
 
-public interface PagedServiceObserver<T> {
+import edu.byu.cs.tweeter.client.model.service.observer.Observer;
+
+public interface PagedServiceObserver<T> extends Observer {
     void handleSuccess(List<T> items, boolean hasMorePages);
-    void handleFailure(String message);
 }
